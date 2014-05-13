@@ -1,6 +1,4 @@
 #!/usr/bin/python
-
-from sys import argv, exit, stdout
 from argparse import ArgumentParser
 from urllib.request import urlopen
 
@@ -78,7 +76,6 @@ def get_free(links):
 
 def get_taglist():
     return sorted(x.split('"')[0] for x in get_page(TAGSPAGE).split("/tag/"))[2:]
-
 
 
 def main():
