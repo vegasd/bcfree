@@ -12,6 +12,7 @@ T_GOOD = '!'
 
 TEMPLATE = "http://bandcamp.com/tag/{0}?sort_field=date"
 TEMPLATEP = "http://bandcamp.com/tag/{0}?sort_field=date&page={1}"
+TAGSPAGE = "http://bandcamp.com/tags"
 
 
 def get_page(url, times=3):
@@ -75,9 +76,14 @@ def get_free(links):
             good.append(link)
     return good
 
+def get_taglist():
+    return sorted(x.split('"')[0] for x in get_page(TAGSPAGE).split("/tag/"))[2:]
+
+
 
 def main():
-    parser = ArgumentParser(description='Get links for FREE bandcamp ALBUMS.')
+    parser = ArgumentParser(description='Get links for FREE bandcamp ALBUMS.',
+                            epilog='to get list of all tags: %(prog)s taglist')
     parser.add_argument('tags', metavar='TAG', type=str, nargs='+',
                         help='Tags to process (e.g. "black-metal" or "punk")')
     parser.add_argument('--num', '-n', type=int, default=0,
@@ -85,6 +91,9 @@ def main():
     parser.add_argument('--maxpage', '-m', type=int, default=10,
                         help='Max page number to process')
     options = parser.parse_args()
+    if 'taglist' in options.tags:
+        print(" ".join(get_taglist()))
+        return
     links = []
     for tag in options.tags:
         links += get_links(tag, options.num, options.maxpage)
