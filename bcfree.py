@@ -1,6 +1,9 @@
 #!/usr/bin/python
+from math import ceil
 from argparse import ArgumentParser
 from urllib.request import urlopen
+
+from multiprocessing import Pool
 
 T_UNKNOWN = '_'
 T_ERROR = 'E'
@@ -13,9 +16,9 @@ TEMPLATEP = "http://bandcamp.com/tag/{0}?sort_field=date&page={1}"
 TAGSPAGE = "http://bandcamp.com/tags"
 
 
-def get_page(url, times=3):
+def get_page(url, times=7):
     try:
-        usock = urlopen(url, None, 2)
+        usock = urlopen(url, None, 4)
         data = usock.read()
         usock.close()
     except Exception as e:
@@ -27,24 +30,20 @@ def get_page(url, times=3):
 
 
 def get_links_from_page(url):
+    print(".", end="", flush=True)
     return [x.split('title')[0].split("href=")[1].strip('" ')
             for x in get_page(url).split('<li class="item">')[1:]]
 
 
-def get_links(tag, num=0, maxpage=1):
-    print('[{}] getting page... '.format(tag), end="", flush=True)
-    links = get_links_from_page(TEMPLATE.format(tag))
-    if not num:
-        print()
-        return links
-
-    p = 1
-    while len(links) < num and p <= maxpage:
-        print(p, end="", flush=True)
-        links = list(set(get_links_from_page(TEMPLATEP.format(tag,p)) + links))
-        p += 1
-    print()
-    return links[:num]
+def get_links(tags, num=0):
+    pgs = []
+    for tag in tags:
+        pgs += [TEMPLATE.format(tag)]
+        if num:
+            pgs += [TEMPLATEP.format(tag,i) for i in range(1,num+1)]
+    with Pool(processes=min(len(pgs), 10)) as pool:
+        links = [x for lst in pool.map(get_links_from_page, pgs) for x in lst]
+    return links
 
 
 def get_page_type(page):
@@ -64,18 +63,18 @@ def get_page_type(page):
     return T_UNKNOWN
 
 
-def get_free(links):
-    good = []
-    for link in links:
-        page = get_page(link)
-        t = get_page_type(page)
-        print(t, end='', flush=True)
-        if t == T_GOOD:
-            good.append(link)
-    return good
+def get_page_free(link):
+    page = get_page(link)
+    t = get_page_type(page)
+    print(t, end='', flush=True)
+    if t == T_GOOD:
+       return link
 
-def get_taglist():
-    return sorted(x.split('"')[0] for x in get_page(TAGSPAGE).split("/tag/"))[2:]
+
+def get_free_p(links, processes):
+    with Pool(processes=processes) as pool:
+        good = pool.map(get_page_free, links)
+    return filter(lambda x: x!=None, good)
 
 
 def main():
@@ -84,19 +83,21 @@ def main():
     parser.add_argument('tags', metavar='TAG', type=str, nargs='+',
                         help='Tags to process (e.g. "black-metal" or "punk")')
     parser.add_argument('--num', '-n', type=int, default=0,
-                        help='Number of links to check for each tag')
-    parser.add_argument('--maxpage', '-m', type=int, default=10,
-                        help='Max page number to process')
+                        help='Number of pages to check, 0=check only initial')
+    parser.add_argument('--processes', '-p', type=int, default=10,
+                        help='Number of parallel processes (connections)')
     options = parser.parse_args()
     if 'taglist' in options.tags:
-        print(" ".join(get_taglist()))
+        print(" ".join(sorted(x.split('"')[0] for x
+                              in get_page(TAGSPAGE).split("/tag/"))[2:]))
         return
     links = []
-    for tag in options.tags:
-        links += get_links(tag, options.num, options.maxpage)
+    links = get_links(options.tags, options.num)
     links = set(links)
-    print("got {0} links \n".format(len(links))+'_'*len(links))
-    print("\n"+"\n".join(get_free(links)))
+    print("\ngot {0} links \n".format(len(links))+'_'*len(links))
+    p = get_free_p(links, options.processes)
+    print("\n"+"\n".join(p))
+
 
 if __name__ == "__main__":
     main()
