@@ -1,0 +1,56 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-11-25 00:19+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bcfree.py:75 bcfree.py:79
+msgid "Get links for FREE bandcamp ALBUMS."
+msgstr "Получить ссылки на бесплатные альбомы с bandcamp."
+
+#: bcfree.py:77 bcfree.py:81
+msgid "tags to process (e.g. \"black-metal\" or \"punk\")"
+msgstr ""
+"тэги, по которым производится поиск (например \"black-metal\" или \"punk\")"
+
+#: bcfree.py:79 bcfree.py:83
+msgid "show list of valid tags and exit"
+msgstr "показать список допустимых тэгов и выйти"
+
+#: bcfree.py:81 bcfree.py:85
+msgid "number of pages to check, 0=check only initial"
+msgstr "количество страниц для проверки, 0 — только начальная"
+
+#: bcfree.py:83 bcfree.py:87
+msgid "number of parallel processes (connections)"
+msgstr "количество параллельных процессов (подключений)"
+
+#: bcfree.py:101 bcfree.py:105
+msgid "{} pages got error. Waiting {} seconds."
+msgstr "{} страниц получено с ошибкой. Ожидаем {} секунд."
+
+#: bcfree.py:52
+msgid "processing list pages: {}"
+msgstr "поиск ссылок: {}"
+
+#: bcfree.py:53
+msgid "processing list pages: "
+msgstr "поиск ссылок: "
+
+#: bcfree.py:98
+msgid "got {} links"
+msgstr "получено {} ссылок"
+
